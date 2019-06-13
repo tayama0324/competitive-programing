@@ -39,14 +39,14 @@ inline string to_s(ll n){char buf[32];sprintf(buf,"%lld",n);return string(buf);}
 
 const int N = 4;
 
-ll MOD = 1;
+ll MOD = 1000000007;
 
-template class MInt {
+class MInt {
   ll value;
 public:
   MInt() : value(0) {}
-  MInt(int v) : value(v) {}
-  MInt(ll v) : value(v) {}
+  MInt(int v) : value(v) { value %= MOD; }
+  MInt(ll v) : value(v) { value %= MOD; }
   MInt& operator+=(const MInt &r) {
     value += r.value; if (value > MOD) value -= MOD; return *this;
   }
@@ -64,6 +64,7 @@ public:
   MInt operator*(const MInt &r) const { MInt result = *this; result *= r; return result; }
   MInt operator/(const MInt &r) const { MInt result = *this; result /= r; return result; }
   MInt pow(ll p) const {
+    assert(0 <= p);
     MInt result = 1, x = *this;
     for (;p;p >>= 1) {
       if (p & 1) result *= x;
@@ -77,8 +78,8 @@ public:
 };
 
 template<int N, typename T> class Matrix {
-  T value[N][N];
 public:
+  T value[N][N];
   Matrix() { fill(0); }
 
   void fill(T t) { REP(i,N) REP(j,N) value[i][j] = t; }
@@ -87,54 +88,107 @@ public:
     static Matrix<N, T> tmp;
     tmp.fill(0);
     REP(i,N) REP(j,N) REP(k,N) tmp.value[i][j] += value[i][k] * that.value[k][j];
-    return *this = tmp;
+    *this = tmp;
+    return *this;
   }
   Matrix<N, T> operator*(const Matrix<N, T> &that) const {
     Matrix<N, T> result = *this;
     result *= that;
     return result;
   }
-  vector<T> operator*(const vector<T> v) const {
+  vector<T> operator*(const vector<T> &v) const {
+    assert(v.size() == N);
     vector<T> result(N);
-    REP(i,N) REP(j,N) result[i] += value[i][j] + v[j];
+    REP(i,N) REP(j,N) result[i] += value[i][j] * v[j];
     return result;
   }
-  void set(int i, int j, T val) { value[i][j] = val; }
+  T& operator()(int i, int j) { return value[i][j]; }
 
-  Matrix<N, T>& pow(ll p) {
-    static Matrix<N, T> sq = *this;
-    this->identity();
-    for (; p; p <<= 1) {
-      if (p & 1) *this *= sq;
+  Matrix<N, T> pow(ll p) const {
+    assert(0 <= p);
+    static Matrix<N, T> result, sq;
+    sq = *this;
+    result.identity();
+    for (; p; p >>= 1) {
+      if (p & 1) result = result * sq;
       sq *= sq;
     }
-    return *this;
+    return result;
   }
+
+  void print() const { REP(i,N) pp(value[i], N); }
 };
 
 
 typedef Matrix<4, MInt> Mat;
 
-ll calc(ll l, ll a, ll b, ll m, ll base) {
+ll calc(ll l, ll a, ll b, MInt base) {
   Mat mt;
-  mt.set(0, 0, 1);
-  mt.set(1, 1, 1);
-  mt.set(2, 0, 1);
-  mt.set(2, 2, b);
-  mt.set(3, 2, 1);
-  mt.set(3, 3, base);
-  mt.pow(l);
-  
-  Mat result; result.identity();
-  for (ll p = l; p; p <<= 1) {
-    if (p & 1) result *= mt;
-  }
+  mt(0, 0) = 1;
+  mt(1, 1) = 1;
+  mt(2, 1) = 1;
+  mt(2, 2) = 1;
+  mt(3, 2) = 1;
+  mt(3, 3) = base;
+  mt = mt.pow(l);  
+  vector<MInt> x = { a, b, a, 0 };
+  vector<MInt> result = mt * x;
+  return result[3];
 }
 
+void test() {
+  Mat a, b, c, d;
+  a(0, 0) = 1;
+  a(0, 1) = 2;
+  a(1, 1) = 3;
+  a(1, 2) = 4;
+  a(2, 2) = 5;
+  a(2, 3) = 6;
+  a(3, 3) = 7;
+  a(3, 0) = 8;
+
+  b = a;
+  (a * b).print();
+  cout << endl;
+  (a * a).print();
+  cout << endl;
+}
 
 int main() {
+  // test();
+  // return 0;
+
   ll l, a, b, m;
   while (cin >> l >> a >> b >> m) {
     MOD = m;
+
+    // returns max i where s_i < upper
+    auto index = [&](ll upper) { return (upper - a - 1) / b; };
+    
+    ll left = 1;
+    ll s_next = 0;
+    MInt result = 0;
+    const ll s_max = a + b * (l - 1);
+    FOR(digit, 1, 20) {
+      if (s_next >= l) break;
+      ll right = left * 10.0 > s_max + 1 ? s_max + 1 : left * 10;
+      ll s_until = min(index(right), l - 1);
+      ll len = max(0LL, s_until - s_next + 1);
+
+      // cout << digit << " digits number: " << left << " - " << right << endl;
+      // cout << "s: " << s_next << ' ' << s_until << endl;
+      // cout << "index, l, a = " << index(right) << ' ' << l << ' ' << a << endl;
+      // cout << "s[i]: " << (a + b * s_next) << ' ' << (a + b * s_until) << endl;
+      // cout << len << " elements" << endl;
+      // cout << "len, digit = " << len << " " << digit << endl;
+      // cout << "calc = " << calc(len, MInt(a) + MInt(b) * MInt(s_next), b, left * 10) << endl;
+      // cout << endl; 
+      result *= MInt(10).pow(len).pow(digit);
+      result += calc(len, MInt(a) + MInt(b) * MInt(s_next), b, MInt(left) * MInt(10));
+      s_next += len;
+      left *= 10;
+    }
+
+    cout << result << endl;
   }
 }
