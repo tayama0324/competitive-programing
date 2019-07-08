@@ -44,7 +44,19 @@ inline void YESNO(bool b) { return write_bool(b, "YES", "NO"); }
 inline void YesNo(bool b) { return write_bool(b, "Yes", "No"); }
 inline void yesno(bool b) { return write_bool(b, "yes", "no"); }
 
-
 int main() {
-
+  int n; string s;
+  while (cin >> n) {
+    cin >> s;
+    int op = 0, cl = 0;
+    REP(i,n) {
+      if (s[i] == '(') {
+        op++;
+      } else {
+        if (op > 0) op--;
+        else cl++;
+      }
+    }
+    cout << string(cl, '(') << s << string(op, ')') << endl;
+  }
 }

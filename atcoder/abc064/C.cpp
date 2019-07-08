@@ -37,14 +37,21 @@ template<class T>T& gs(T& a,T b){ if(b>a) a=b; return a; }
 inline ll to_i(const string& s){ll n;sscanf(s.c_str(),"%lld",&n);return n;}
 inline string to_s(ll n){char buf[32];sprintf(buf,"%lld",n);return string(buf);}
 
-inline void write_bool(bool b, const string &tval, const string &fval) {
-  cout << (b ? tval : fval) << endl;
-} 
-inline void YESNO(bool b) { return write_bool(b, "YES", "NO"); }
-inline void YesNo(bool b) { return write_bool(b, "Yes", "No"); }
-inline void yesno(bool b) { return write_bool(b, "yes", "no"); }
-
+inline string bool_to_string(bool b, const string &tval, const string fval) { return b ? tval : fval; } 
+string YESNO(bool b) { return bool_to_string(b, "YES", "NO"); }
+string YesNo(bool b) { return bool_to_string(b, "Yes", "No"); }
+string yesno(bool b) { return bool_to_string(b, "yes", "no"); }
 
 int main() {
-
+  int n;
+  while (cin >> n) {
+    set<int> st;
+    int c = 0;
+    REP(i,n) {
+      int t; cin >> t;
+      if (t >= 3200) c++;
+      else { t /= 400; st.insert(t); }
+    }
+    cout << max(1, (int)st.size()) << ' ' << st.size() + c << endl;
+  }
 }
