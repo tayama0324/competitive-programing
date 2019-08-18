@@ -29,7 +29,7 @@ typedef vector<int> vint;
 typedef vector<long long> vll;
 typedef vector<string> vstring;
 typedef vector<double> vdouble;
-
+ 
 template<class T>void pp(T v,int n){ REP(i,n)cout<<v[i]<<(i+1==n?'\n':' '); }
 template<class T>void pp(T v){ EACH(it,v) cout<<(it==v.begin()?"":" ")<<*it; cout << endl;  }
 template<class T>T& ls(T& a,T b){ if(b<a) a=b; return a; }
@@ -48,5 +48,8 @@ ll gcd(ll a, ll b) { return b?gcd(b,a%b):a; }
 ll lcm(ll a, ll b) { return a/gcd(a,b)*b; }
 
 int main() {
-
+  ll x, y;
+  while (cin >> x >> y) {
+    cout << gcd(x, y) << endl;
+  }
 }

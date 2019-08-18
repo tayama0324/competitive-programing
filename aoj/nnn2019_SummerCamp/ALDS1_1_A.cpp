@@ -29,7 +29,7 @@ typedef vector<int> vint;
 typedef vector<long long> vll;
 typedef vector<string> vstring;
 typedef vector<double> vdouble;
-
+ 
 template<class T>void pp(T v,int n){ REP(i,n)cout<<v[i]<<(i+1==n?'\n':' '); }
 template<class T>void pp(T v){ EACH(it,v) cout<<(it==v.begin()?"":" ")<<*it; cout << endl;  }
 template<class T>T& ls(T& a,T b){ if(b<a) a=b; return a; }
@@ -44,9 +44,15 @@ inline void YESNO(bool b) { return write_bool(b, "YES", "NO"); }
 inline void YesNo(bool b) { return write_bool(b, "Yes", "No"); }
 inline void yesno(bool b) { return write_bool(b, "yes", "no"); }
 
-ll gcd(ll a, ll b) { return b?gcd(b,a%b):a; }
-ll lcm(ll a, ll b) { return a/gcd(a,b)*b; }
 
 int main() {
-
+  int n;
+  while (cin >> n) {
+    vint v(n);
+    REP(i,n) cin >> v[i];
+    REP(i,n) {
+      sort(v.begin(), v.begin() + i + 1);
+      pp(v,n);
+    }
+  }
 }
